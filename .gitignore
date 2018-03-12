@@ -157,3 +157,6 @@ $RECYCLE.BIN/
 
 # Visual Studio modeling
 /Modeling/CodeGeneration.Log.xml
+/.vs
+/packages
+/test

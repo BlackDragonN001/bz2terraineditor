@@ -8,26 +8,39 @@ namespace BZ2TerrainEditor
 	/// </summary>
 	public class Terrain
 	{
-		#region Fields
+        private readonly int CLUSTER_SIZE;
 
-		/// <summary>
-		/// The width of the terrain.
-		/// </summary>
-		public readonly int Width;
-		/// <summary>
-		/// The height of the terrain.
-		/// </summary>
-		public readonly int Height;
+        #region Fields
 
-		/// <summary>
-		/// The height map.
-		/// </summary>
-		public readonly short[,] HeightMap;
+        public readonly Int16 GridMinX;
+        public readonly Int16 GridMinZ;
+        public readonly Int16 GridMaxX;
+        public readonly Int16 GridMaxZ;
 
-		/// <summary>
-		/// The RGB color map.
-		/// </summary>
-		public readonly RGB[,] ColorMap;
+        public int Width => GridMaxX - GridMinX;
+        public int Height => GridMaxZ - GridMinZ;
+
+        public readonly UInt32 Version;
+
+        /// <summary>
+        /// The width of the terrain.
+        /// </summary>
+        //public readonly int Width;
+        /// <summary>
+        /// The height of the terrain.
+        /// </summary>
+        //public readonly int Height;
+
+        /// <summary>
+        /// The height map.
+        /// </summary>
+        public readonly short[,] HeightMap;
+        public readonly float[,] HeightMapFloat;
+
+        /// <summary>
+        /// The RGB color map.
+        /// </summary>
+        public readonly RGB[,] ColorMap;
 
 		/// <summary>
 		/// The normal map.
@@ -69,14 +82,17 @@ namespace BZ2TerrainEditor
 		/// </summary>
 		public readonly uint[,] InfoMap;
 
-		private short heightMapMin;
-		private short heightMapMax;
+        private short heightMapMin;
+        private short heightMapMax;
 
-		#endregion
+        private Single heightMapFloatMin;
+        private Single heightMapFloatMax;
 
-		#region Properties
+        #endregion
 
-		public short HeightMapMin
+        #region Properties
+
+        public short HeightMapMin
 		{
 			get { return this.heightMapMin; }	
 		}
@@ -86,35 +102,64 @@ namespace BZ2TerrainEditor
 			get { return this.heightMapMax; }
 		}
 
-		#endregion
+        public Single HeightMapFloatMin
+        {
+            get { return this.heightMapFloatMin; }
+        }
 
-		#region Constructors
+        public Single HeightMapFloatMax
+        {
+            get { return this.heightMapFloatMax; }
+        }
 
-		/// <summary>
-		/// Creates a new Terrain.
-		/// </summary>
-		public Terrain(int width, int height)
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Creates a new Terrain.
+        /// </summary>
+        public Terrain(UInt32 version, Int16 gridMinX, Int16 gridMinZ, Int16 gridMaxX, Int16 gridMaxZ)
 		{
-			if (width % 4 != 0) throw new ArgumentException("Width must be a multiple of 4.", "width");
-			if (height % 4 != 0) throw new ArgumentException("Height must be a multiple of 4.", "height");
-			
-			this.Width = width;
-			this.Height = height;
+            this.Version = version;
 
-			this.HeightMap = new short[width, height];
-			this.ColorMap = new RGB[width, height];
+            if (version < 4) CLUSTER_SIZE = 4;
+            if (version >= 4) CLUSTER_SIZE = 16;
+
+            int width = gridMaxX - gridMinX;
+            int height = gridMaxZ - gridMinZ;
+            
+            if (width % CLUSTER_SIZE != 0) throw new ArgumentException($"Width must be a multiple of {CLUSTER_SIZE}.", "width");
+            if (height % CLUSTER_SIZE != 0) throw new ArgumentException($"Height must be a multiple of {CLUSTER_SIZE}.", "height");
+
+            this.GridMinX = gridMinX;
+            this.GridMinZ = gridMinZ;
+            this.GridMaxX = gridMaxX;
+            this.GridMaxZ = gridMaxZ;
+            if (Version < 4)
+            {
+                this.HeightMap = new short[width, height];
+            }
+            else
+            {
+                this.HeightMapFloat = new Single[width, height];
+            }
+            this.ColorMap = new RGB[width, height];
 			this.NormalMap = new byte[width, height];
 			this.AlphaMap1 = new byte[width, height];
 			this.AlphaMap2 = new byte[width, height];
 			this.AlphaMap3 = new byte[width, height];
 			this.CellMap = new CellType[width, height];
-			this.InfoMap = new uint[width / 4, height / 4];
+			this.InfoMap = new uint[width / CLUSTER_SIZE, height / CLUSTER_SIZE];
 
 			this.Clear();
 
 			this.heightMapMin = short.MaxValue;
 			this.heightMapMax = short.MinValue;
-		}
+            this.heightMapFloatMin = float.MaxValue;
+            this.heightMapFloatMax = float.MinValue;
+
+        }
 
 		#endregion
 
@@ -125,16 +170,32 @@ namespace BZ2TerrainEditor
 		/// </summary>
 		public void UpdateMinMax()
 		{
-			this.heightMapMin = short.MaxValue;
-			this.heightMapMax = short.MinValue;
-			for (int y = 0; y < this.Height; y++)
-			{
-				for (int x = 0; x < this.Width; x++)
-				{
-					if (this.HeightMap[x, y] < this.heightMapMin) this.heightMapMin = this.HeightMap[x, y];
-					if (this.HeightMap[x, y] > this.heightMapMax) this.heightMapMax = this.HeightMap[x, y];
-				}
-			}
+            this.heightMapMin = short.MaxValue;
+            this.heightMapMax = short.MinValue;
+            this.heightMapFloatMin = float.MaxValue;
+            this.heightMapFloatMax = float.MinValue;
+            if (Version < 4)
+            {
+                for (int y = 0; y < this.Height; y++)
+                {
+                    for (int x = 0; x < this.Width; x++)
+                    {
+                        if (this.HeightMap[x, y] < this.heightMapMin) this.heightMapMin = this.HeightMap[x, y];
+                        if (this.HeightMap[x, y] > this.heightMapMax) this.heightMapMax = this.HeightMap[x, y];
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 0; y < this.Height; y++)
+                {
+                    for (int x = 0; x < this.Width; x++)
+                    {
+                        if (this.HeightMapFloat[x, y] < this.heightMapFloatMin) this.heightMapFloatMin = this.HeightMapFloat[x, y];
+                        if (this.HeightMapFloat[x, y] > this.heightMapFloatMax) this.heightMapFloatMax = this.HeightMapFloat[x, y];
+                    }
+                }
+            }
 		}
 
 		/// <summary>
@@ -157,38 +218,62 @@ namespace BZ2TerrainEditor
 			BinaryWriter writer = new BinaryWriter(stream);
 
 			writer.Write(0x52524554u); // 'TERR'
-			writer.Write(0x00000003u); // version
-			writer.Write((ushort)(0x10000 - this.Width / 2)); // not sure what these two are.
-			writer.Write((ushort)(0x10000 - this.Height / 2)); // ^
-			writer.Write((ushort)(this.Width / 2));
-			writer.Write((ushort)(this.Height / 2));
+            if (Version < 4)
+            {
+                writer.Write(0x00000003u); // version
+            }
+            else
+            {
+                writer.Write(Version); // version
+            }
+            writer.Write(GridMinX);
+			writer.Write(GridMinZ);
+			writer.Write(GridMaxX);
+			writer.Write(GridMaxZ);
 
-			for (int y = 0; y < this.Height; y += 4)
+			for (int y = 0; y < this.Height; y += CLUSTER_SIZE)
 			{
-				for (int x = 0; x < this.Width; x += 4)
+				for (int x = 0; x < this.Width; x += CLUSTER_SIZE)
 				{
-					// height map
-					for (int cy = 0; cy < 4; cy++)
-					{
-						for (int cx = 0; cx < 4; cx++)
-						{
-							writer.Write(this.HeightMap[x + cx, y + cy]);
-						}
-					}
+                    if (Version < 4)
+                    {
+                        // height map
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                writer.Write(this.HeightMap[x + cx, y + cy]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // height map
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                writer.Write(this.HeightMapFloat[x + cx, y + cy]);
+                            }
+                        }
+                    }
 
-					// normal map
-					for (int cy = 0; cy < 4; cy++)
-					{
-						for (int cx = 0; cx < 4; cx++)
-						{
-							writer.Write(this.NormalMap[x + cx, y + cy]);
-						}
-					}
+                    if (Version < 4)
+                    {
+                        // normal map
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                writer.Write(this.NormalMap[x + cx, y + cy]);
+                            }
+                        }
+                    }
 
 					// color map
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							writer.Write(this.ColorMap[x + cx, y + cy].R);
 							writer.Write(this.ColorMap[x + cx, y + cy].G);
@@ -197,43 +282,43 @@ namespace BZ2TerrainEditor
 					}
 
 					// alpha map 1
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							writer.Write(this.AlphaMap1[x + cx, y + cy]);
 						}
 					}
 
 					// alpha map 2
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							writer.Write(this.AlphaMap2[x + cx, y + cy]);
 						}
 					}
 
 					// alpha map 3
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							writer.Write(this.AlphaMap3[x + cx, y + cy]);
 						}
 					}
 
 					// cliff map
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							writer.Write((byte)this.CellMap[x + cx, y + cy]);
 						}
 					}
 
 					// info map
-					writer.Write(this.InfoMap[x / 4, y / 4]);
+					writer.Write(this.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE]);
 				}
 			}
 		}
@@ -247,7 +332,14 @@ namespace BZ2TerrainEditor
 			{
 				for (int x = 0; x < this.Width; x++)
 				{
-					this.HeightMap[x, y] = 0;
+                    if (this.Version < 4)
+                    {
+                        this.HeightMap[x, y] = 0;
+                    }
+                    else
+                    {
+                        this.HeightMapFloat[x, y] = 0f;
+                    }
 					this.NormalMap[x, y] = 0;
 					this.ColorMap[x, y].R = this.ColorMap[x, y].G = this.ColorMap[x, y].B = 255;
 					this.AlphaMap1[x, y] = this.AlphaMap2[x, y] = this.AlphaMap3[x, y] = 0;
@@ -255,9 +347,9 @@ namespace BZ2TerrainEditor
 				}	
 			}
 
-			for (int y = 0; y < this.Height / 4; y++)
+			for (int y = 0; y < this.Height / CLUSTER_SIZE; y++)
 			{
-				for (int x = 0; x < this.Width / 4; x++)
+				for (int x = 0; x < this.Width / CLUSTER_SIZE; x++)
 				{
 					this.InfoMap[x, y] = 0;
 				}
@@ -290,57 +382,85 @@ namespace BZ2TerrainEditor
 		/// <returns></returns>
 		public static Terrain Read(Stream stream)
 		{
-			BinaryReader reader = new BinaryReader(stream);
+            int CLUSTER_SIZE = 4;
+
+            BinaryReader reader = new BinaryReader(stream);
 
 			if (reader.ReadUInt32() != 0x52524554u) // 'TERR'
 				throw new Exception("Invalid magic number.");
 
-			int version = reader.ReadInt32();
+			UInt32 version = reader.ReadUInt32();
 
-			if(version < 1 || version > 3)
+			if(version < 1 || version > 4)
 				throw new NotSupportedException(string.Format("Version {0} is not supported.", version));
 
-			reader.ReadUInt16(); // some other width?
-			reader.ReadUInt16(); // some other height?
+            if (version == 4) CLUSTER_SIZE = 16;
 
-			int width = reader.ReadUInt16() * 2;
-			int height = reader.ReadUInt16() * 2;
+            Int16 gridMinX = reader.ReadInt16();
+            Int16 gridMinZ = reader.ReadInt16();
+            Int16 gridMaxX = reader.ReadInt16();
+            Int16 gridMaxZ = reader.ReadInt16();
 
-			Terrain terrain = new Terrain(width, height);
+            int width = gridMaxX - gridMinX;
+            int height = gridMaxZ - gridMinZ;
 
-			for (int y = 0; y < height; y += 4)
+            Terrain terrain = new Terrain(version, gridMinX, gridMinZ, gridMaxX, gridMaxZ);
+
+
+
+            for (int y = 0; y < height; y += CLUSTER_SIZE)
 			{
-				for (int x = 0; x < width; x += 4)
+				for (int x = 0; x < width; x += CLUSTER_SIZE)
 				{
-					// height map
-					for (int cy = 0; cy < 4; cy++)
-					{
-						for (int cx = 0; cx < 4; cx++)
-						{
-							short value = reader.ReadInt16();
-							terrain.HeightMap[x + cx, y + cy] = value;
-							if (value < terrain.heightMapMin) terrain.heightMapMin = value;
-							if (value > terrain.heightMapMax) terrain.heightMapMax = value;
-						}
-						if (version < 3) reader.ReadInt16();
-					}
-					if (version < 3) reader.ReadBytes(10);
+                    // height map
+                    if (version < 4)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                short value = reader.ReadInt16();
+                                terrain.HeightMap[x + cx, y + cy] = value;
+                                if (value < terrain.heightMapMin) terrain.heightMapMin = value;
+                                if (value > terrain.heightMapMax) terrain.heightMapMax = value;
+                            }
+                            if (version < 3) reader.ReadInt16();
+                        }
+                        if (version < 3) reader.ReadBytes(10);
+                    }
+                    else
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                Single value = reader.ReadSingle();
+                                terrain.HeightMapFloat[x + cx, y + cy] = value;
 
-					// normal map
-					for (int cy = 0; cy < 4; cy++)
-					{
-						for (int cx = 0; cx < 4; cx++)
-						{
-							terrain.NormalMap[x + cx, y + cy] = reader.ReadByte();
-						}
-						if (version < 3) reader.ReadByte();
-					}
-					if (version < 3) reader.ReadBytes(5);
+                                if (value < terrain.heightMapFloatMin) terrain.heightMapFloatMin = value;
+                                if (value > terrain.heightMapFloatMax) terrain.heightMapFloatMax = value;
+                            }
+                        }
+                    }
+
+                    // normal map
+                    if (version < 4)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.NormalMap[x + cx, y + cy] = reader.ReadByte();
+                            }
+                            if (version < 3) reader.ReadByte();
+                        }
+                        if (version < 3) reader.ReadBytes(5);
+                    }
 
 					// color map
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							terrain.ColorMap[x + cx, y + cy].R = reader.ReadByte();
 							terrain.ColorMap[x + cx, y + cy].G = reader.ReadByte();
@@ -351,9 +471,9 @@ namespace BZ2TerrainEditor
 					if (version < 3) reader.ReadBytes(15);
 
 					// alpha map 1
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							terrain.AlphaMap1[x + cx, y + cy] = reader.ReadByte();
 						}
@@ -362,9 +482,9 @@ namespace BZ2TerrainEditor
 					if (version < 3) reader.ReadBytes(5);
 
 					// alpha map 2
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							terrain.AlphaMap2[x + cx, y + cy] = reader.ReadByte();
 						}
@@ -373,9 +493,9 @@ namespace BZ2TerrainEditor
 					if (version < 3) reader.ReadBytes(5);
 
 					// alpha map 3
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							terrain.AlphaMap3[x + cx, y + cy] = reader.ReadByte();
 						}
@@ -384,9 +504,9 @@ namespace BZ2TerrainEditor
 					if (version < 3) reader.ReadBytes(5);
 
 					// cliff map
-					for (int cy = 0; cy < 4; cy++)
+					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
 					{
-						for (int cx = 0; cx < 4; cx++)
+						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
 						{
 							terrain.CellMap[x + cx, y + cy] = (CellType)reader.ReadByte();
 						}
@@ -395,7 +515,7 @@ namespace BZ2TerrainEditor
 					if (version < 3) reader.ReadBytes(5);
 
 					// info map
-					terrain.InfoMap[x / 4, y / 4] = reader.ReadUInt32();
+					terrain.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE] = reader.ReadUInt32();
 
 					// ???
 					if (version < 3) reader.ReadBytes(25);
@@ -412,15 +532,30 @@ namespace BZ2TerrainEditor
 			{
 				for (int x = 0; x < this.Width; x++)
 				{
-					int newValue = this.HeightMap[x, y];
-					newValue += translation;
+                    if (this.Version < 4)
+                    {
+                        int newValue = this.HeightMap[x, y];
+                        newValue += translation;
 
-					if (newValue < short.MinValue)
-						newValue = short.MinValue;
-					else if (newValue > short.MaxValue)
-						newValue = short.MaxValue;
+                        if (newValue < short.MinValue)
+                            newValue = short.MinValue;
+                        else if (newValue > short.MaxValue)
+                            newValue = short.MaxValue;
 
-					this.HeightMap[x, y] = (short)newValue;
+                        this.HeightMap[x, y] = (short)newValue;
+                    }
+                    else
+                    {
+                        Single newValue = this.HeightMapFloat[x, y];
+                        newValue += translation;
+
+                        if (newValue < Single.MinValue)
+                            newValue = Single.MinValue;
+                        else if (newValue > Single.MaxValue)
+                            newValue = Single.MaxValue;
+
+                        this.HeightMapFloat[x, y] = (Single)newValue;
+                    }
 				}
 			}
 

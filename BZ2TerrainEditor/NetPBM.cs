@@ -45,15 +45,30 @@ namespace BZ2TerrainEditor
 			writer.WriteLine("{0} {1}", terrain.Width.ToString(CultureInfo.InvariantCulture), terrain.Height.ToString(CultureInfo.InvariantCulture));
 			writer.WriteLine("65535");
 
-			for (int y = 0; y < terrain.Height; y++)
-			{
-				for (int x = 0; x < terrain.Width; x++)
-				{
-					writer.Write(((int)terrain.HeightMap[x, y] - terrain.HeightMapMin).ToString(CultureInfo.InvariantCulture));
-					writer.Write(" ");
-				}
-				writer.WriteLine();
-			}
+            if (terrain.Version < 4)
+            {
+                for (int y = 0; y < terrain.Height; y++)
+                {
+                    for (int x = 0; x < terrain.Width; x++)
+                    {
+                        writer.Write(((int)terrain.HeightMap[x, y] - terrain.HeightMapMin).ToString(CultureInfo.InvariantCulture));
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+            }
+            else
+            {
+                for (int y = 0; y < terrain.Height; y++)
+                {
+                    for (int x = 0; x < terrain.Width; x++)
+                    {
+                        writer.Write(((int)((terrain.HeightMapFloat[x, y] - terrain.HeightMapFloatMin) * 10)).ToString(CultureInfo.InvariantCulture));
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+            }
 
 			writer.Close();
 		}
@@ -74,29 +89,57 @@ namespace BZ2TerrainEditor
 
 			readToken(stream); // max.
 
-			for (int y = 0; y < terrain.Height; y++)
-			{
-				for (int x = 0; x < terrain.Width; x++)
-				{
-					int value = int.Parse(readToken(stream), CultureInfo.InvariantCulture);
-					if (value < 0 || value > 65535)
-						throw new InvalidDataException("Invalid value.");
+            if (terrain.Version > 4)
+            {
+                for (int y = 0; y < terrain.Height; y++)
+                {
+                    for (int x = 0; x < terrain.Width; x++)
+                    {
+                        int value = int.Parse(readToken(stream), CultureInfo.InvariantCulture);
+                        if (value < 0 || value > 65535)
+                            throw new InvalidDataException("Invalid value.");
 
-					value += short.MinValue;
-					terrain.HeightMap[x, y] = (short)value;
-				}
-			}
-			
-			terrain.UpdateMinMax();
-			
-			int translation = -terrain.HeightMapMin;
+                        value += short.MinValue;
+                        terrain.HeightMap[x, y] = (short)value;
+                    }
+                }
 
-			if (terrain.HeightMapMax + translation > short.MaxValue)
-				translation = short.MaxValue - terrain.HeightMapMax;
+                terrain.UpdateMinMax();
 
-			if (translation > 0)
-				terrain.Translate(translation);
-		}
+                int translation = -terrain.HeightMapMin;
+
+                if (terrain.HeightMapMax + translation > short.MaxValue)
+                    translation = short.MaxValue - terrain.HeightMapMax;
+
+                if (translation > 0)
+                    terrain.Translate(translation);
+            }
+            else
+            {
+                for (int y = 0; y < terrain.Height; y++)
+                {
+                    for (int x = 0; x < terrain.Width; x++)
+                    {
+                        int value = int.Parse(readToken(stream), CultureInfo.InvariantCulture);
+                        if (value < 0 || value > 65535)
+                            throw new InvalidDataException("Invalid value.");
+
+                        value += short.MinValue;
+                        terrain.HeightMapFloat[x, y] = (float)value / 10f;
+                    }
+                }
+
+                terrain.UpdateMinMax();
+
+                float translation = -terrain.HeightMapFloatMin;
+
+                if (terrain.HeightMapFloatMax + translation > float.MaxValue)
+                    translation = float.MaxValue - terrain.HeightMapFloatMax;
+
+                if (translation > 0)
+                    terrain.Translate((short)(translation * 10));
+            }
+        }
 
 		#endregion
 	}

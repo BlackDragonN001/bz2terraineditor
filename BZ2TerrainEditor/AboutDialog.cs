@@ -38,7 +38,11 @@ namespace BZ2TerrainEditor
 			Process.Start("http://p.yusukekamiyamane.com/");
 		}
 
-		#endregion
-		
-	}
+        private void updatedLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://nielk1.com/");
+        }
+
+        #endregion
+    }
 }
