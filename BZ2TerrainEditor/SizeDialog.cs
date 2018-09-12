@@ -15,21 +15,27 @@ namespace BZ2TerrainEditor
 		#region Fields
 
 		private int selectedSize;
-		
-		#endregion
+		private uint version;
 
-		#region Properties
+        #endregion
 
-		public int SelectedSize
-		{
-			get { return this.selectedSize; }
-		}
+        #region Properties
 
-		#endregion
+        public int SelectedSize
+        {
+            get { return this.selectedSize; }
+        }
 
-		#region Constructors
+        public uint Version
+        {
+            get { return this.version; }
+        }
 
-		public SizeDialog()
+        #endregion
+
+        #region Constructors
+
+        public SizeDialog()
 		{
 			this.InitializeComponent();
 		}
@@ -44,9 +50,19 @@ namespace BZ2TerrainEditor
 				this.okButton.Enabled = true;
 			else
 				this.okButton.Enabled = false;
-		}
+        }
 
-		private void okButton_Click(object sender, EventArgs e)
+        private void versionSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            version = (uint)(5 - versionSelector.SelectedIndex);
+        }
+
+        private void SizeDialog_Load(object sender, EventArgs e)
+        {
+            versionSelector.SelectedIndex = 0;
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
 		{
 			if (this.valueSelector.Value % 4 != 0)
 				return;
@@ -58,10 +74,8 @@ namespace BZ2TerrainEditor
 		private void cancelButton_Click(object sender, EventArgs e)
 		{
 			this.DialogResult = DialogResult.Cancel;
-		}
+        }
 
-		#endregion
-
-
-	}
+        #endregion
+    }
 }

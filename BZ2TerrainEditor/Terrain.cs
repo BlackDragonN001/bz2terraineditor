@@ -217,25 +217,167 @@ namespace BZ2TerrainEditor
 		{
 			BinaryWriter writer = new BinaryWriter(stream);
 
-			writer.Write(0x52524554u); // 'TERR'
-            if (Version < 4)
+            if (Version > 0)
             {
-                writer.Write(0x00000003u); // version
+                writer.Write(0x52524554u); // 'TERR'
+                if (Version < 4)
+                {
+                    writer.Write(0x00000003u); // version
+                }
+                else
+                {
+                    writer.Write(Version); // version
+                }
+                writer.Write(GridMinX);
+                writer.Write(GridMinZ);
+                writer.Write(GridMaxX);
+                writer.Write(GridMaxZ);
             }
-            else
-            {
-                writer.Write(Version); // version
-            }
-            writer.Write(GridMinX);
-			writer.Write(GridMinZ);
-			writer.Write(GridMaxX);
-			writer.Write(GridMaxZ);
 
 			for (int y = 0; y < this.Height; y += CLUSTER_SIZE)
 			{
 				for (int x = 0; x < this.Width; x += CLUSTER_SIZE)
 				{
-                    if (Version < 4)
+                    bool haveHeight = true;
+                    bool haveColor = true;
+                    bool haveAlpha1 = true;
+                    bool haveAlpha2 = true;
+                    bool haveAlpha3 = true;
+                    bool haveCell = true;
+
+                    if (Version >= 5)
+                    {
+                        haveHeight = false;
+                        haveColor = false;
+                        haveAlpha1 = false;
+                        haveAlpha2 = false;
+                        haveAlpha3 = false;
+                        haveCell = false;
+
+                        short height = this.HeightMap[x, y];
+                        RGB color = this.ColorMap[x, y];
+                        byte alpha1 = this.AlphaMap1[x, y];
+                        byte alpha2 = this.AlphaMap2[x, y];
+                        byte alpha3 = this.AlphaMap3[x, y];
+                        CellType cell = this.CellMap[x, y];
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveHeight)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (height != this.HeightMap[x + cx, y + cy])
+                                    {
+                                        haveHeight = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveColor)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (color.R != this.ColorMap[x + cx, y + cy].R ||
+                                        color.G != this.ColorMap[x + cx, y + cy].G ||
+                                        color.B != this.ColorMap[x + cx, y + cy].B)
+                                    {
+                                        haveColor = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveAlpha1)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (alpha1 != this.AlphaMap1[x + cx, y + cy])
+                                    {
+                                        haveAlpha1 = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveAlpha2)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (alpha2 != this.AlphaMap2[x + cx, y + cy])
+                                    {
+                                        haveAlpha2 = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveAlpha3)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (alpha3 != this.AlphaMap3[x + cx, y + cy])
+                                    {
+                                        haveAlpha3 = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            if (!haveCell)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    if (cell != this.CellMap[x + cx, y + cy])
+                                    {
+                                        haveCell = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        byte Compression = 0;
+                        if (haveHeight) Compression += 1;
+                        if (haveColor) Compression += (1 >> 1);
+                        if (haveAlpha1) Compression += (1 >> 2);
+                        if (haveAlpha2) Compression += (1 >> 3);
+                        if (haveAlpha3) Compression += (1 >> 4);
+                        if (haveCell) Compression += (1 >> 5);
+                        writer.Write(Compression);
+                    }
+
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.HeightMap[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
                     {
                         // height map
                         for (int cy = 0; cy < CLUSTER_SIZE; cy++)
@@ -249,16 +391,37 @@ namespace BZ2TerrainEditor
                     else
                     {
                         // height map
-                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        if (haveHeight)
                         {
-                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
                             {
-                                writer.Write(this.HeightMapFloat[x + cx, y + cy]);
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write(this.HeightMapFloat[x + cx, y + cy]);
+                                }
                             }
+                        }
+                        else
+                        {
+                            writer.Write(this.HeightMapFloat[x, y]);
                         }
                     }
 
-                    if (Version < 4)
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.NormalMap[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
                     {
                         // normal map
                         for (int cy = 0; cy < CLUSTER_SIZE; cy++)
@@ -270,56 +433,187 @@ namespace BZ2TerrainEditor
                         }
                     }
 
-					// color map
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							writer.Write(this.ColorMap[x + cx, y + cy].R);
-							writer.Write(this.ColorMap[x + cx, y + cy].G);
-							writer.Write(this.ColorMap[x + cx, y + cy].B);
-						}
-					}
+                    // color map
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.ColorMap[x + _cx, y + _cy].R);
+                                writer.Write(this.ColorMap[x + _cx, y + _cy].G);
+                                writer.Write(this.ColorMap[x + _cx, y + _cy].B);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
+                    {
+                        if (haveColor)
+                        {
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write(this.ColorMap[x + cx, y + cy].R);
+                                    writer.Write(this.ColorMap[x + cx, y + cy].G);
+                                    writer.Write(this.ColorMap[x + cx, y + cy].B);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(this.ColorMap[x, y].R);
+                            writer.Write(this.ColorMap[x, y].G);
+                            writer.Write(this.ColorMap[x, y].B);
+                        }
+                    }
 
-					// alpha map 1
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							writer.Write(this.AlphaMap1[x + cx, y + cy]);
-						}
-					}
+                    // alpha map 1
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.AlphaMap1[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
+                    {
+                        if (haveAlpha1)
+                        {
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write(this.AlphaMap1[x + cx, y + cy]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(this.AlphaMap1[x, y]);
+                        }
+                    }
 
-					// alpha map 2
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							writer.Write(this.AlphaMap2[x + cx, y + cy]);
-						}
-					}
+                    // alpha map 2
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.AlphaMap2[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
+                    {
+                        if (haveAlpha2)
+                        {
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write(this.AlphaMap2[x + cx, y + cy]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(this.AlphaMap2[x, y]);
+                        }
+                    }
 
-					// alpha map 3
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							writer.Write(this.AlphaMap3[x + cx, y + cy]);
-						}
-					}
+                    // alpha map 3
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write(this.AlphaMap3[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
+                    {
+                        if (haveAlpha3)
+                        {
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write(this.AlphaMap3[x + cx, y + cy]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(this.AlphaMap3[x, y]);
+                        }
+                    }
 
-					// cliff map
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							writer.Write((byte)this.CellMap[x + cx, y + cy]);
-						}
-					}
+                    // cliff map
+                    if (Version < 3)
+                    {
+                        for (int cy = 0; cy < (CLUSTER_SIZE + 1); cy++)
+                        {
+                            for (int cx = 0; cx < (CLUSTER_SIZE + 1); cx++)
+                            {
+                                int _cx = cx;
+                                int _cy = cy;
+                                if ((x + cx) == this.Width) _cx--;
+                                if ((x + cy) == this.Width) _cy--;
+                                writer.Write((byte)this.CellMap[x + _cx, y + _cy]);
+                            }
+                        }
+                    }
+                    else if (Version < 4)
+                    {
+                        if (haveCell)
+                        {
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    writer.Write((byte)this.CellMap[x + cx, y + cy]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            writer.Write((byte)this.CellMap[x, y]);
+                        }
+                    }
 
 					// info map
 					writer.Write(this.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE]);
-				}
+
+                    // ???
+                    if (Version > 0)
+                    {
+                        if (Version < 3) for (int i = 0; i < 25; i++) writer.Write(0x00);
+                        if (Version == 2) writer.Write(0x00);
+                    }
+                }
 			}
 		}
 
@@ -381,37 +675,78 @@ namespace BZ2TerrainEditor
 		/// <param name="stream">The data stream.</param>
 		/// <returns></returns>
 		public static Terrain Read(Stream stream)
-		{
+        {
             int CLUSTER_SIZE = 4;
 
             BinaryReader reader = new BinaryReader(stream);
 
-			if (reader.ReadUInt32() != 0x52524554u) // 'TERR'
-				throw new Exception("Invalid magic number.");
+            bool version0 = false;
 
-			UInt32 version = reader.ReadUInt32();
+            if (reader.ReadUInt32() != 0x52524554u) // 'TERR'
+            {
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                version0 = true;
+                //throw new Exception("Invalid magic number.");
+            }
 
-			if(version < 1 || version > 4)
+            UInt32 version = 0;
+            if (!version0) version = reader.ReadUInt32();
+
+			if(version < 0 || version > 5)
 				throw new NotSupportedException(string.Format("Version {0} is not supported.", version));
 
-            if (version == 4) CLUSTER_SIZE = 16;
+            if (version >= 4) CLUSTER_SIZE = 16;
 
-            Int16 gridMinX = reader.ReadInt16();
-            Int16 gridMinZ = reader.ReadInt16();
-            Int16 gridMaxX = reader.ReadInt16();
-            Int16 gridMaxZ = reader.ReadInt16();
+            Int16 gridMinX = 0;
+            Int16 gridMinZ = 0;
+            Int16 gridMaxX = 0;
+            Int16 gridMaxZ = 0;
+
+            if (version > 0)
+            {
+                gridMinX = reader.ReadInt16();
+                gridMinZ = reader.ReadInt16();
+                gridMaxX = reader.ReadInt16();
+                gridMaxZ = reader.ReadInt16();
+            }
+            else
+            {
+                long ClusterCount = (stream.Length / 0xfd);
+                ClusterCount = (long)Math.Sqrt(ClusterCount);
+
+                gridMinX = (Int16)(-ClusterCount / 2);
+                gridMinZ = (Int16)(-ClusterCount / 2);
+                gridMaxX = (Int16)(ClusterCount / 2);
+                gridMaxZ = (Int16)(ClusterCount / 2);
+            }
 
             int width = gridMaxX - gridMinX;
             int height = gridMaxZ - gridMinZ;
 
             Terrain terrain = new Terrain(version, gridMinX, gridMinZ, gridMaxX, gridMaxZ);
 
-
-
             for (int y = 0; y < height; y += CLUSTER_SIZE)
 			{
 				for (int x = 0; x < width; x += CLUSTER_SIZE)
 				{
+                    bool haveHeight = true;
+                    bool haveColor = true;
+                    bool haveAlpha1 = true;
+                    bool haveAlpha2 = true;
+                    bool haveAlpha3 = true;
+                    bool haveCell = true;
+
+                    if (version >= 5)
+                    {
+                        byte CompressionData = reader.ReadByte();
+                        haveHeight = (CompressionData & 1) != 0;
+                        haveColor = (CompressionData & (1 << 1)) != 0;
+                        haveAlpha1 = (CompressionData & (1 << 2)) != 0;
+                        haveAlpha2 = (CompressionData & (1 << 3)) != 0;
+                        haveAlpha3 = (CompressionData & (1 << 4)) != 0;
+                        haveCell = (CompressionData & (1 << 5)) != 0;
+                    }
+
                     // height map
                     if (version < 4)
                     {
@@ -424,22 +759,37 @@ namespace BZ2TerrainEditor
                                 if (value < terrain.heightMapMin) terrain.heightMapMin = value;
                                 if (value > terrain.heightMapMax) terrain.heightMapMax = value;
                             }
-                            if (version < 3) reader.ReadInt16();
+                            if (version < 3) reader.ReadInt16(); // 5th vertex (from next cluster)
                         }
-                        if (version < 3) reader.ReadBytes(10);
+                        if (version < 3) reader.ReadBytes(10); // 5th row of vertecies (from next cluster)
                     }
                     else
                     {
-                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        if (haveHeight)
                         {
-                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
                             {
-                                Single value = reader.ReadSingle();
-                                terrain.HeightMapFloat[x + cx, y + cy] = value;
-
-                                if (value < terrain.heightMapFloatMin) terrain.heightMapFloatMin = value;
-                                if (value > terrain.heightMapFloatMax) terrain.heightMapFloatMax = value;
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    Single value = reader.ReadSingle();
+                                    terrain.HeightMapFloat[x + cx, y + cy] = value;
+                                    if (value < terrain.heightMapFloatMin) terrain.heightMapFloatMin = value;
+                                    if (value > terrain.heightMapFloatMax) terrain.heightMapFloatMax = value;
+                                }
                             }
+                        }
+                        else
+                        {
+                            Single value = reader.ReadSingle();
+                            for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                            {
+                                for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                                {
+                                    terrain.HeightMapFloat[x + cx, y + cy] = value;
+                                }
+                            }
+                            if (value < terrain.heightMapFloatMin) terrain.heightMapFloatMin = value;
+                            if (value > terrain.heightMapFloatMax) terrain.heightMapFloatMax = value;
                         }
                     }
 
@@ -450,76 +800,165 @@ namespace BZ2TerrainEditor
                         {
                             for (int cx = 0; cx < CLUSTER_SIZE; cx++)
                             {
-                                terrain.NormalMap[x + cx, y + cy] = reader.ReadByte();
+                                byte value = reader.ReadByte();
+                                terrain.NormalMap[x + cx, y + cy] = value;
                             }
-                            if (version < 3) reader.ReadByte();
+                            if (version < 3) reader.ReadByte(); // 5th vertex (from next cluster)
                         }
-                        if (version < 3) reader.ReadBytes(5);
+                        if (version < 3) reader.ReadBytes(5); // 5th row of vertecies (from next cluster)
                     }
 
-					// color map
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							terrain.ColorMap[x + cx, y + cy].R = reader.ReadByte();
-							terrain.ColorMap[x + cx, y + cy].G = reader.ReadByte();
-							terrain.ColorMap[x + cx, y + cy].B = reader.ReadByte();
-						}
-						if (version < 3) reader.ReadBytes(3);
-					}
-					if (version < 3) reader.ReadBytes(15);
+                    // color map
+                    if (haveColor)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                byte R = reader.ReadByte();
+                                byte G = reader.ReadByte();
+                                byte B = reader.ReadByte();
 
-					// alpha map 1
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							terrain.AlphaMap1[x + cx, y + cy] = reader.ReadByte();
-						}
-						if (version < 3) reader.ReadByte();
-					}
-					if (version < 3) reader.ReadBytes(5);
+                                terrain.ColorMap[x + cx, y + cy].R = R;
+                                terrain.ColorMap[x + cx, y + cy].G = G;
+                                terrain.ColorMap[x + cx, y + cy].B = B;
+                            }
+                            if (version < 3) reader.ReadBytes(3); // 5th vertex (from next cluster)
+                        }
+                        if (version < 3) reader.ReadBytes(15); // 5th row of vertecies (from next cluster)
+                    }
+                    else
+                    {
+                        byte R = reader.ReadByte();
+                        byte G = reader.ReadByte();
+                        byte B = reader.ReadByte();
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.ColorMap[x + cx, y + cy].R = R;
+                                terrain.ColorMap[x + cx, y + cy].G = G;
+                                terrain.ColorMap[x + cx, y + cy].B = B;
+                            }
+                        }
+                    }
 
-					// alpha map 2
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							terrain.AlphaMap2[x + cx, y + cy] = reader.ReadByte();
-						}
-						if (version < 3) reader.ReadByte();
-					}
-					if (version < 3) reader.ReadBytes(5);
+                    // alpha map 1
+                    if (haveAlpha1)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                byte value = reader.ReadByte();
+                                terrain.AlphaMap1[x + cx, y + cy] = value;
+                            }
+                            if (version < 3) reader.ReadByte(); // 5th vertex (from next cluster)
+                        }
+                        if (version < 3) reader.ReadBytes(5); // 5th row of vertecies (from next cluster)
+                    }
+                    else
+                    {
+                        byte value = reader.ReadByte();
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.AlphaMap1[x + cx, y + cy] = value;
+                            }
+                        }
+                    }
 
-					// alpha map 3
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							terrain.AlphaMap3[x + cx, y + cy] = reader.ReadByte();
-						}
-						if (version < 3) reader.ReadByte();
-					}
-					if (version < 3) reader.ReadBytes(5);
+                    // alpha map 2
+                    if (haveAlpha2)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                byte value = reader.ReadByte();
+                                terrain.AlphaMap2[x + cx, y + cy] = value;
+                            }
+                            if (version < 3) reader.ReadByte(); // 5th vertex (from next cluster)
+                        }
+                        if (version < 3) reader.ReadBytes(5); // 5th row of vertecies (from next cluster)
+                    }
+                    else
+                    {
+                        byte value = reader.ReadByte();
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.AlphaMap2[x + cx, y + cy] = value;
+                            }
+                        }
+                    }
 
-					// cliff map
-					for (int cy = 0; cy < CLUSTER_SIZE; cy++)
-					{
-						for (int cx = 0; cx < CLUSTER_SIZE; cx++)
-						{
-							terrain.CellMap[x + cx, y + cy] = (CellType)reader.ReadByte();
-						}
-						if (version < 3) reader.ReadByte();
-					}
-					if (version < 3) reader.ReadBytes(5);
+                    // alpha map 3
+                    if (haveAlpha3)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                byte value = reader.ReadByte();
+                                terrain.AlphaMap3[x + cx, y + cy] = value;
+                            }
+                            if (version < 3) reader.ReadByte(); // 5th vertex (from next cluster)
+                        }
+                        if (version < 3) reader.ReadBytes(5); // 5th row of vertecies (from next cluster)
+                    }
+                    else
+                    {
+                        byte value = reader.ReadByte();
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.AlphaMap3[x + cx, y + cy] = value;
+                            }
+                        }
+                    }
 
-					// info map
-					terrain.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE] = reader.ReadUInt32();
+                    // cliff map
+                    if (haveCell)
+                    {
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                CellType value = (CellType)reader.ReadByte();
+                                terrain.CellMap[x + cx, y + cy] = value;
+                            }
+                            if (version < 3) reader.ReadByte(); // 5th vertex (from next cluster)
+                        }
+                        if (version < 3) reader.ReadBytes(5); // 5th row of vertecies (from next cluster)
+                    }
+                    else
+                    {
+                        CellType value = (CellType)reader.ReadByte();
+                        for (int cy = 0; cy < CLUSTER_SIZE; cy++)
+                        {
+                            for (int cx = 0; cx < CLUSTER_SIZE; cx++)
+                            {
+                                terrain.CellMap[x + cx, y + cy] = value;
+                            }
+                        }
+                    }
 
-					// ???
-					if (version < 3) reader.ReadBytes(25);
-					if (version == 2) reader.ReadByte();
+                    // info map
+                    {
+                        UInt32 value = reader.ReadUInt32();
+                        terrain.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE] = value;
+                    }
+
+                    // ???
+                    if (version > 0)
+                    {
+                        if (version < 3) reader.ReadBytes(25);
+                        if (version == 2) reader.ReadByte();
+                    }
 				}
 			}
 

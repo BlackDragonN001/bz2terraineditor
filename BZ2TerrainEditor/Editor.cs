@@ -295,9 +295,9 @@ namespace BZ2TerrainEditor
 			else
 			{
 				if (this.changed)
-					this.Text = string.Format("{0} * - BattleZone II/CC Terrain Editor", this.currentFile.Name);
+					this.Text = string.Format("{0} (version {1}) * - BattleZone II/CC Terrain Editor", this.currentFile.Name, this.terrain.Version);
 				else
-					this.Text = string.Format("{0} - BattleZone II/CC Terrain Editor", this.currentFile.Name);
+					this.Text = string.Format("{0} (version {1}) - BattleZone II/CC Terrain Editor", this.currentFile.Name, this.terrain.Version);
 			}
 		}
 
@@ -710,7 +710,7 @@ namespace BZ2TerrainEditor
 			SizeDialog dialog = new SizeDialog();
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{
-                Editor editor = new Editor(new Terrain(4, (short)(-dialog.SelectedSize / 2), (short)(-dialog.SelectedSize / 2), (short)(dialog.SelectedSize / 2), (short)(dialog.SelectedSize / 2)));
+                Editor editor = new Editor(new Terrain(dialog.Version, (short)(-dialog.SelectedSize / 2), (short)(-dialog.SelectedSize / 2), (short)(dialog.SelectedSize / 2), (short)(dialog.SelectedSize / 2)));
 				this.Close();
 				editor.Show();
 			}
@@ -727,9 +727,9 @@ namespace BZ2TerrainEditor
 				{
 					try
 					{
-						this.terrain = Terrain.Read(dialog.FileName);
-					}
-					catch (Exception bug)
+                        this.terrain = Terrain.Read(dialog.FileName);
+                    }
+                    catch (Exception bug)
 					{
 						MessageBox.Show(bug.ToString(), "Failed to load terrain.");
 					}
@@ -744,7 +744,7 @@ namespace BZ2TerrainEditor
 				}
 				else
 				{
-					Editor editor = new Editor(dialog.FileName);
+                    Editor editor = new Editor(dialog.FileName);
 					editor.Show();
 				}
 			}
