@@ -254,7 +254,7 @@ namespace BZ2TerrainEditor
                         haveAlpha3 = false;
                         haveCell = false;
 
-                        short height = this.HeightMap[x, y];
+                        float height = this.HeightMapFloat[x, y];
                         RGB color = this.ColorMap[x, y];
                         byte alpha1 = this.AlphaMap1[x, y];
                         byte alpha2 = this.AlphaMap2[x, y];
@@ -267,7 +267,7 @@ namespace BZ2TerrainEditor
                             {
                                 for (int cx = 0; cx < CLUSTER_SIZE; cx++)
                                 {
-                                    if (height != this.HeightMap[x + cx, y + cy])
+                                    if (height != this.HeightMapFloat[x + cx, y + cy])
                                     {
                                         haveHeight = true;
                                         break;

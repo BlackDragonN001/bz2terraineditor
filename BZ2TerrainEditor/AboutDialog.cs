@@ -21,7 +21,7 @@ namespace BZ2TerrainEditor
 		{
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			this.InitializeComponent();
-			this.versionLabel.Text = string.Format(this.versionLabel.Text, assembly.GetName().Version.Major, assembly.GetName().Version.Minor);
+			this.versionLabel.Text = string.Format(this.versionLabel.Text, assembly.GetName().Version);
 		}
 
 		#endregion
