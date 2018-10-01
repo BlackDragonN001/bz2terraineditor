@@ -450,7 +450,7 @@ namespace BZ2TerrainEditor
                             }
                         }
                     }
-                    else if (Version < 4)
+                    else //if (Version < 4)
                     {
                         if (haveColor)
                         {
@@ -487,7 +487,7 @@ namespace BZ2TerrainEditor
                             }
                         }
                     }
-                    else if (Version < 4)
+                    else //if (Version < 4)
                     {
                         if (haveAlpha1)
                         {
@@ -520,7 +520,7 @@ namespace BZ2TerrainEditor
                             }
                         }
                     }
-                    else if (Version < 4)
+                    else //if (Version < 4)
                     {
                         if (haveAlpha2)
                         {
@@ -553,7 +553,7 @@ namespace BZ2TerrainEditor
                             }
                         }
                     }
-                    else if (Version < 4)
+                    else //if (Version < 4)
                     {
                         if (haveAlpha3)
                         {
@@ -586,7 +586,7 @@ namespace BZ2TerrainEditor
                             }
                         }
                     }
-                    else if (Version < 4)
+                    else //if (Version < 4)
                     {
                         if (haveCell)
                         {
