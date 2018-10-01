@@ -355,11 +355,11 @@ namespace BZ2TerrainEditor
 
                         byte Compression = 0;
                         if (haveHeight) Compression += 1;
-                        if (haveColor) Compression += (1 >> 1);
-                        if (haveAlpha1) Compression += (1 >> 2);
-                        if (haveAlpha2) Compression += (1 >> 3);
-                        if (haveAlpha3) Compression += (1 >> 4);
-                        if (haveCell) Compression += (1 >> 5);
+                        if (haveColor) Compression += (1 << 1);
+                        if (haveAlpha1) Compression += (1 << 2);
+                        if (haveAlpha2) Compression += (1 << 3);
+                        if (haveAlpha3) Compression += (1 << 4);
+                        if (haveCell) Compression += (1 << 5);
                         writer.Write(Compression);
                     }
 
