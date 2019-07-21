@@ -856,7 +856,7 @@ namespace BZ2TerrainEditor
                     {
                         for (int y = 0; y < data.Height; y++)
                             for (int x = 0; x < data.Width; x++)
-                                terrain.HeightMapFloat[x, y] = ((float)buffer[y * data.Stride + x * 3] * (float)(rangeDialog.Maximum - rangeDialog.Minimum) / 255.0f + (float)rangeDialog.Minimum) * 0.1f;
+                                terrain.HeightMapFloat[x, y] = ((float)buffer[y * data.Stride + x * 3] * (float)(rangeDialog.Maximum - rangeDialog.Minimum) / 255.0f + (float)rangeDialog.Minimum); // * 0.1f;
                     }
 				}
 				else if (dialog.FilterIndex == 3)
