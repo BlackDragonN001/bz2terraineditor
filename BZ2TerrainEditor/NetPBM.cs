@@ -89,7 +89,7 @@ namespace BZ2TerrainEditor
 
 			readToken(stream); // max.
 
-            if (terrain.Version > 4)
+            if (terrain.Version < 4)
             {
                 for (int y = 0; y < terrain.Height; y++)
                 {
