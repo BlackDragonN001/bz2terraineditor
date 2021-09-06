@@ -8,14 +8,14 @@ namespace BZ2TerrainEditor
 	/// </summary>
 	public class Terrain
 	{
-        private readonly int CLUSTER_SIZE;
+        public readonly int CLUSTER_SIZE;
 
         #region Fields
 
-        public readonly Int16 GridMinX;
-        public readonly Int16 GridMinZ;
-        public readonly Int16 GridMaxX;
-        public readonly Int16 GridMaxZ;
+        public Int16 GridMinX;
+        public Int16 GridMinZ;
+        public Int16 GridMaxX;
+        public Int16 GridMaxZ;
 
         public int Width => GridMaxX - GridMinX;
         public int Height => GridMaxZ - GridMinZ;
@@ -999,8 +999,17 @@ namespace BZ2TerrainEditor
 			}
 
 			this.UpdateMinMax();
-		}
+        }
 
-		#endregion
-	}
+        public void SetPan(short GridMinX, short GridMinZ)
+        {
+            this.GridMaxX = (short)(GridMinX + this.Width);
+            this.GridMaxZ = (short)(GridMinZ + this.Height);
+
+            this.GridMinX = GridMinX;
+            this.GridMinZ = GridMinZ;
+        }
+
+        #endregion
+    }
 }

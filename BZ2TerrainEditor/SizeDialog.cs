@@ -46,7 +46,7 @@ namespace BZ2TerrainEditor
 
 		private void valueSelector_ValueChanged(object sender, EventArgs e)
 		{
-			if (this.valueSelector.Value % 4 == 0)
+			if (this.valueSelector.Value % valueSelector.Increment == 0)
 				this.okButton.Enabled = true;
 			else
 				this.okButton.Enabled = false;
@@ -55,6 +55,25 @@ namespace BZ2TerrainEditor
         private void versionSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
             version = (uint)(5 - versionSelector.SelectedIndex);
+
+            switch(version)
+            {
+                case 5:
+                case 4:
+                    valueSelector.Increment = 16;
+                    break;
+                case 3:
+                case 2:
+                case 1:
+                case 0:
+                    valueSelector.Increment = 4;
+                    break;
+            }
+
+            if (this.valueSelector.Value % valueSelector.Increment == 0)
+                this.okButton.Enabled = true;
+            else
+                this.okButton.Enabled = false;
         }
 
         private void SizeDialog_Load(object sender, EventArgs e)
@@ -64,7 +83,7 @@ namespace BZ2TerrainEditor
 
         private void okButton_Click(object sender, EventArgs e)
 		{
-			if (this.valueSelector.Value % 4 != 0)
+			if (this.valueSelector.Value % valueSelector.Increment != 0)
 				return;
 			
 			this.selectedSize = (int)this.valueSelector.Value;

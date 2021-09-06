@@ -49,7 +49,7 @@
             // valueSelector
             // 
             this.valueSelector.Increment = new decimal(new int[] {
-            4,
+            16,
             0,
             0,
             0});

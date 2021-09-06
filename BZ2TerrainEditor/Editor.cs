@@ -1168,6 +1168,20 @@ namespace BZ2TerrainEditor
 			this.changed = true;
 		}
 
+		private void heightMapTranslatePan_Click(object sender, EventArgs e)
+		{
+			if (this.terrain == null)
+				return;
+
+			HeightMapTranslatePanDialog dialog = new HeightMapTranslatePanDialog(this.terrain);
+			if (dialog.ShowDialog() != DialogResult.OK)
+				return;
+
+			this.terrain.SetPan((short)dialog.Value.X, (short)dialog.Value.Y);
+			this.initialize();
+			this.changed = true;
+		}
+
 		private void heightMapOverlayCheck_Click(object sender, EventArgs e)
 		{
 			this.heightMapOverlay.Visible = this.heightMapOverlayCheck.Checked;
@@ -1700,12 +1714,11 @@ namespace BZ2TerrainEditor
 
 			this.saveImage(this.tileMap3Preview.Image);
 		}
-		
-		#endregion
 
+        #endregion
 
-		#endregion
-		
-		#endregion
-	}
+        #endregion
+
+        #endregion
+    }
 }
