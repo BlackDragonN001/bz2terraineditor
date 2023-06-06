@@ -524,7 +524,7 @@
             this.heightMapTranslate.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.heightMapTranslate.Name = "heightMapTranslate";
             this.heightMapTranslate.Size = new System.Drawing.Size(23, 22);
-            this.heightMapTranslate.Text = "Translate";
+            this.heightMapTranslate.Text = "Translate Height";
             this.heightMapTranslate.Click += new System.EventHandler(this.heightMapTranslate_Click);
             // 
             // heightMapOverlayCheck
@@ -546,7 +546,7 @@
             this.heightMapTranslatePan.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.heightMapTranslatePan.Name = "heightMapTranslatePan";
             this.heightMapTranslatePan.Size = new System.Drawing.Size(23, 22);
-            this.heightMapTranslatePan.Text = "toolStripButton1";
+            this.heightMapTranslatePan.Text = "Translate Map Center";
             this.heightMapTranslatePan.Click += new System.EventHandler(this.heightMapTranslatePan_Click);
             // 
             // heightMapPreview
