@@ -50,6 +50,8 @@ namespace BZ2TerrainEditor
 				this.okButton.Enabled = true;
 			else
 				this.okButton.Enabled = false;
+
+            UpdateMeterTip();
         }
 
         private void versionSelector_SelectedIndexChanged(object sender, EventArgs e)
@@ -61,12 +63,14 @@ namespace BZ2TerrainEditor
                 case 5:
                 case 4:
                     valueSelector.Increment = 16;
+                    valueSelector.Maximum = 4096;
                     break;
                 case 3:
                 case 2:
                 case 1:
                 case 0:
                     valueSelector.Increment = 4;
+                    valueSelector.Maximum = 1024;
                     break;
             }
 
@@ -74,6 +78,27 @@ namespace BZ2TerrainEditor
                 this.okButton.Enabled = true;
             else
                 this.okButton.Enabled = false;
+
+            UpdateMeterTip();
+        }
+
+        private void UpdateMeterTip()
+        {
+            version = (uint)(5 - versionSelector.SelectedIndex);
+
+            switch (version)
+            {
+                case 5:
+                case 4:
+                    meterTip.Text = $"{(this.valueSelector.Value * 2)} Meters (at default density)";
+                    break;
+                case 3:
+                case 2:
+                case 1:
+                case 0:
+                    meterTip.Text = $"{(this.valueSelector.Value * 8)} Meters (at default density)";
+                    break;
+            }
         }
 
         private void SizeDialog_Load(object sender, EventArgs e)
