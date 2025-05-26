@@ -18,7 +18,7 @@ namespace BZ2TerrainEditor
 
 		private const string terrainFileFilter = "BZ2/BZCC terrain files (*.ter)|*.ter|All files (*.*)|*";
 		private const string bitmapFileFilter = "Portable Network Graphics (*.png)|*.png|Bitmap (*.bmp)|*.bmp";
-		private const string heightMapFileFilter = "Portable Network Graphics (*.png)|*.png|Bitmap (*.bmp)|*.bmp|ASCII Portable Graymap (*.pgm)|*.pgm|Raw 16-bit data (*.*)|*|Raw IEEE 754 float data (*.*)|*|GridFloat (*.flt + *.hdr)|*.flt|Float TIFF (*.tiff)|*.tiff";
+		private const string heightMapFileFilter = "Portable Network Graphics (*.png)|*.png|Bitmap (*.bmp)|*.bmp|ASCII Portable Graymap (*.pgm)|*.pgm|Raw 16-bit data (*.*)|*|Raw IEEE 754 float data (*.*)|*|GridFloat (*.flt + *.hdr)|*.flt|Float TIFF (*.tiff)|*.tiff|Wavefront OBJ (*.obj)|*.obj";
 
 
         #endregion
@@ -941,6 +941,35 @@ namespace BZ2TerrainEditor
                         input.Close();
                     }
                 }
+                else if (dialog.FilterIndex == 8)
+                {
+					using (FileStream stream = new FileStream(dialog.FileName, FileMode.Open, FileAccess.Read))
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+						while (!reader.EndOfStream)
+						{
+							string line = reader.ReadLine();
+							if (line.StartsWith("#") || string.IsNullOrWhiteSpace(line))
+								continue;
+							string[] parts = line.Split(' ');
+							if (parts.Length < 4 || parts[0] != "v")
+								continue;
+							int x = int.Parse(parts[1]) / (this.terrain.Version < 4 ? 8 : 2);
+							float heightValue = float.Parse(parts[2]);
+							int y = -int.Parse(parts[3]) / (this.terrain.Version < 4 ? 8 : 2);
+							if (x < 0 || x >= this.terrain.Width || y < 0 || y >= this.terrain.Height)
+								continue;
+							if (this.terrain.Version < 4)
+							{
+								this.terrain.HeightMap[x, y] = (short)(heightValue * 10);
+							}
+							else
+							{
+								this.terrain.HeightMapFloat[x, y] = heightValue;
+							}
+                        }
+                    }
+                }
             }
 			catch (Exception ex)
 			{
@@ -997,7 +1026,7 @@ namespace BZ2TerrainEditor
                                 }
                                 else
                                 {
-                                    short heightValue = (short)(this.terrain.HeightMap[x, y] * 10);
+                                    short heightValue = (short)(this.terrain.HeightMapFloat[x, y] * 10);
 
                                     row[x * 2 + 0] = unchecked((byte)(heightValue & 0xFF));
                                     row[x * 2 + 1] = unchecked((byte)(heightValue >> 8));
@@ -1146,6 +1175,44 @@ namespace BZ2TerrainEditor
 
                         output.Close();
                     }
+                }
+                else if (dialog.FilterIndex == 8)
+                {
+					using (FileStream stream = new FileStream(dialog.FileName, FileMode.Create, FileAccess.Write))
+					using (StreamWriter writer = new StreamWriter(stream))
+					{
+                        writer.WriteLine("# Vertexes");
+						for (int y = 0; y < this.terrain.Height; y++)
+                        {
+							for (int x = 0; x < this.terrain.Width; x++)
+							{
+								if (this.terrain.Version < 4)
+								{
+									float heightValue = this.terrain.HeightMap[x, y] * 0.1f;
+									writer.WriteLine($"v {(x * 8)} {heightValue} {(y * -8)}");
+								}
+								else
+								{
+									float heightValue = this.terrain.HeightMapFloat[x, y];
+									writer.WriteLine($"v {(x * 2)} {heightValue} {(y * -2)}");
+								}
+							}
+						}
+                        writer.WriteLine("# Faces");
+						for (int y = 0; y < this.terrain.Height - 1; y++)
+                        {
+							for (int x = 0; x < this.terrain.Width - 1; x++)
+							{
+								int UpperLeft = this.terrain.Width * y + x + 1;
+								int UpperRight = this.terrain.Width * y + x + 2;
+								int BottomLeft = UpperLeft + this.terrain.Width;
+                                int BottomRight = UpperRight + this.terrain.Width;
+                                //writer.WriteLine($"f {BottomLeft} {BottomRight} {UpperLeft}");
+                                writer.WriteLine($"f {BottomRight} {BottomLeft} {UpperLeft}");
+                                writer.WriteLine($"f {BottomRight} {UpperLeft} {UpperRight}");
+                            }
+                        }
+					}
                 }
             }
 			catch (Exception ex)
