@@ -34,6 +34,7 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.versionSelector = new System.Windows.Forms.ComboBox();
             this.meterTip = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.valueSelector)).BeginInit();
             this.SuspendLayout();
             // 
@@ -78,7 +79,7 @@
             // okButton
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.okButton.Location = new System.Drawing.Point(185, 89);
+            this.okButton.Location = new System.Drawing.Point(185, 173);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(167, 25);
             this.okButton.TabIndex = 2;
@@ -89,7 +90,7 @@
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cancelButton.Location = new System.Drawing.Point(12, 89);
+            this.cancelButton.Location = new System.Drawing.Point(12, 173);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(167, 25);
             this.cancelButton.TabIndex = 2;
@@ -123,11 +124,21 @@
             this.meterTip.Text = "512 Meters (at default density)";
             this.meterTip.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 88);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(143, 78);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "5 - BZCC\r\n4 - BZCC (no \"compression\")\r\n3 - BZ2\r\n2 - Old\r\n1 - Old\r\n0 - Ancient";
+            // 
             // SizeDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(364, 126);
+            this.ClientSize = new System.Drawing.Size(364, 210);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.meterTip);
             this.Controls.Add(this.versionSelector);
             this.Controls.Add(this.cancelButton);
@@ -142,6 +153,7 @@
             this.Load += new System.EventHandler(this.SizeDialog_Load);
             ((System.ComponentModel.ISupportInitialize)(this.valueSelector)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
@@ -153,5 +165,6 @@
 		private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.ComboBox versionSelector;
         private System.Windows.Forms.Label meterTip;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using BitMiracle.LibTiff.Classic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Linq;
-using BitMiracle.LibTiff.Classic;
 
 namespace BZ2TerrainEditor
 {
@@ -152,11 +153,11 @@ namespace BZ2TerrainEditor
             this.tileMap3Preview.Image = this.generateTileMapImage(this.terrain.InfoMap, 3);
             if (this.terrain.Version < 4)
             {
-                this.heightMapMinMaxLabel.Text = string.Format("min: {0}, max: {1}", this.terrain.HeightMapMin, this.terrain.HeightMapMax);
+                this.heightMapMinMaxLabel.Text = string.Format(CultureInfo.InvariantCulture, "min: {0}, max: {1}", this.terrain.HeightMapMin, this.terrain.HeightMapMax);
             }
             else
             {
-                this.heightMapMinMaxLabel.Text = string.Format("min: {0}, max: {1}", this.terrain.HeightMapFloatMin, this.terrain.HeightMapFloatMax);
+                this.heightMapMinMaxLabel.Text = string.Format(CultureInfo.InvariantCulture, "min: {0}, max: {1}", this.terrain.HeightMapFloatMin, this.terrain.HeightMapFloatMax);
             }
 
             if (this.terrain.HeightMapMin >= 0)

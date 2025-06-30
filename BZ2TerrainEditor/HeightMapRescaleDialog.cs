@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,23 +15,23 @@ namespace BZ2TerrainEditor
     {
         public decimal OriginalMin
         {
-            get { decimal v; return decimal.TryParse(valueSelectorMin1.Text, out v) ? v : 0 ; }
-            set { valueSelectorMin1.Text = value.ToString(); }
+            get { decimal v; return decimal.TryParse(valueSelectorMin1.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out v) ? v : 0 ; }
+            set { valueSelectorMin1.Text = value.ToString(CultureInfo.InvariantCulture); }
         }
         public decimal OriginalMax
         {
-            get { decimal v; return decimal.TryParse(valueSelectorMax1.Text, out v) ? v : 0 ; }
-            set { valueSelectorMax1.Text = value.ToString(); }
+            get { decimal v; return decimal.TryParse(valueSelectorMax1.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out v) ? v : 0 ; }
+            set { valueSelectorMax1.Text = value.ToString(CultureInfo.InvariantCulture); }
         }
         public decimal NewMin
         {
-            get { decimal v; return decimal.TryParse(valueSelectorMin2.Text, out v) ? v : 0 ; }
-            set { valueSelectorMin2.Text = value.ToString(); }
+            get { decimal v; return decimal.TryParse(valueSelectorMin2.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out v) ? v : 0 ; }
+            set { valueSelectorMin2.Text = value.ToString(CultureInfo.InvariantCulture); }
         }
         public decimal NewMax
         {
-            get { decimal v; return decimal.TryParse(valueSelectorMax2.Text, out v) ? v : 0 ; }
-            set { valueSelectorMax2.Text = value.ToString(); }
+            get { decimal v; return decimal.TryParse(valueSelectorMax2.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out v) ? v : 0 ; }
+            set { valueSelectorMax2.Text = value.ToString(CultureInfo.InvariantCulture); }
         }
 
         public HeightMapRescaleDialog()
