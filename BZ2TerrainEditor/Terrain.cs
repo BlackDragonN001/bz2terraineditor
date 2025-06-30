@@ -1001,6 +1001,44 @@ namespace BZ2TerrainEditor
 			this.UpdateMinMax();
         }
 
+        public void RescaleHeight(float min1, float max1, float min2, float max2)
+        {
+            float scale = (max2 - min2) / (max1 - min1);
+
+            for (int y = 0; y < this.Height; y++)
+            {
+                for (int x = 0; x < this.Width; x++)
+                {
+                    if (this.Version < 4)
+                    {
+                        float newValue = this.HeightMap[x, y];
+
+                        // rescale value based on translation of min1..max1 to min2..max2
+                        newValue = (newValue - min1) * scale + min2;
+
+                        // clamp values if limited to short
+                        if (newValue < short.MinValue)
+                            newValue = short.MinValue;
+                        else if (newValue > short.MaxValue)
+                            newValue = short.MaxValue;
+
+                        this.HeightMap[x, y] = (short)newValue;
+                    }
+                    else
+                    {
+                        float newValue = this.HeightMapFloat[x, y];
+
+                        // rescale value based on translation of min1..max1 to min2..max2
+                        newValue = (newValue - min1) * scale + min2;
+
+                        this.HeightMapFloat[x, y] = newValue;
+                    }
+                }
+            }
+
+            this.UpdateMinMax();
+        }
+
         public void SetPan(short GridMinX, short GridMinZ)
         {
             this.GridMaxX = (short)(GridMinX + this.Width);

@@ -72,6 +72,12 @@
     <Compile Include="HeightMapRangeDialog.Designer.cs">
       <DependentUpon>HeightMapRangeDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="HeightMapRescaleDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HeightMapRescaleDialog.Designer.cs">
+      <DependentUpon>HeightMapRescaleDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="HeightMapTranslatePanDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,6 +120,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="HeightMapRangeDialog.resx">
       <DependentUpon>HeightMapRangeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HeightMapRescaleDialog.resx">
+      <DependentUpon>HeightMapRescaleDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HeightMapTranslatePanDialog.resx">
       <DependentUpon>HeightMapTranslatePanDialog.cs</DependentUpon>
@@ -172,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="Resources\arrow-rescale-090.png" />
     <None Include="Resources\arrow-move.png" />
     <None Include="Resources\exclamation-circle.png" />
     <None Include="Resources\arrow-resize-090.png" />

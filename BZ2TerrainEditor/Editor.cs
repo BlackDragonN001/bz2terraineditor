@@ -1247,6 +1247,32 @@ namespace BZ2TerrainEditor
             }
         }
 
+        private void heightMapNormalize_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            HeightMapRescaleDialog dialog = new HeightMapRescaleDialog();
+
+            if (this.terrain.Version < 4)
+            {
+                dialog.OriginalMax = dialog.NewMax = this.terrain.HeightMapMax;
+                dialog.OriginalMin = dialog.NewMin = this.terrain.HeightMapMin;
+            }
+            else
+            {
+                dialog.OriginalMax = dialog.NewMax = (decimal)this.terrain.HeightMapFloatMax;
+                dialog.OriginalMin = dialog.NewMin = (decimal)this.terrain.HeightMapFloatMin;
+            }
+
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            this.terrain.RescaleHeight((float)dialog.OriginalMin, (float)dialog.OriginalMax, (float)dialog.NewMin, (float)dialog.NewMax);
+            this.initialize();
+            this.changed = true;
+        }
+
         private void heightMapTranslate_Click(object sender, EventArgs e)
         {
             if (this.terrain == null)
