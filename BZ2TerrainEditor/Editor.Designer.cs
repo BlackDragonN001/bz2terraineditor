@@ -118,6 +118,23 @@
             this.tileMap3Import = new System.Windows.Forms.ToolStripButton();
             this.tileMap3Export = new System.Windows.Forms.ToolStripButton();
             this.tileMap0Preview = new System.Windows.Forms.PictureBox();
+            this.rotationMapGroup = new System.Windows.Forms.GroupBox();
+            this.rotationMap3Preview = new System.Windows.Forms.PictureBox();
+            this.rotationMap2Preview = new System.Windows.Forms.PictureBox();
+            this.rotationMap1Preview = new System.Windows.Forms.PictureBox();
+            this.rotationMapToolbar = new System.Windows.Forms.ToolStrip();
+            this.rotationMap0Import = new System.Windows.Forms.ToolStripButton();
+            this.rotationMap0Export = new System.Windows.Forms.ToolStripButton();
+            this.rotationMapSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.rotationMap1Import = new System.Windows.Forms.ToolStripButton();
+            this.rotationMap1Export = new System.Windows.Forms.ToolStripButton();
+            this.rotationMapSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.rotationMap2Import = new System.Windows.Forms.ToolStripButton();
+            this.rotationMap2Export = new System.Windows.Forms.ToolStripButton();
+            this.rotationMapSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.rotationMap3Import = new System.Windows.Forms.ToolStripButton();
+            this.rotationMap3Export = new System.Windows.Forms.ToolStripButton();
+            this.rotationMap0Preview = new System.Windows.Forms.PictureBox();
             this.flatnessMapGroup = new System.Windows.Forms.GroupBox();
             this.tileFlatZoneIDs = new System.Windows.Forms.PictureBox();
             this.tileFlatZones = new System.Windows.Forms.PictureBox();
@@ -164,6 +181,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.tileMap1Preview)).BeginInit();
             this.tileMapToolbar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tileMap0Preview)).BeginInit();
+            this.rotationMapGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap3Preview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap2Preview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap1Preview)).BeginInit();
+            this.rotationMapToolbar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap0Preview)).BeginInit();
             this.flatnessMapGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tileFlatZoneIDs)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tileFlatZones)).BeginInit();
@@ -928,15 +951,16 @@
             this.flowLayout.Controls.Add(this.colorMapGroup);
             this.flowLayout.Controls.Add(this.normalMapGroup);
             this.flowLayout.Controls.Add(this.cellMapGroup);
+            this.flowLayout.Controls.Add(this.flatnessMapGroup);
             this.flowLayout.Controls.Add(this.alphaMap1Group);
             this.flowLayout.Controls.Add(this.alphaMap2Group);
             this.flowLayout.Controls.Add(this.alphaMap3Group);
             this.flowLayout.Controls.Add(this.tileMapGroup);
-            this.flowLayout.Controls.Add(this.flatnessMapGroup);
+            this.flowLayout.Controls.Add(this.rotationMapGroup);
             this.flowLayout.Enabled = false;
             this.flowLayout.Location = new System.Drawing.Point(12, 52);
             this.flowLayout.Name = "flowLayout";
-            this.flowLayout.Size = new System.Drawing.Size(1234, 680);
+            this.flowLayout.Size = new System.Drawing.Size(1526, 680);
             this.flowLayout.TabIndex = 11;
             // 
             // tileMapGroup
@@ -1125,6 +1149,192 @@
             this.tileMap0Preview.TabStop = false;
             this.tileMap0Preview.Click += new System.EventHandler(this.tileMap0Preview_Click);
             // 
+            // rotationMapGroup
+            // 
+            this.rotationMapGroup.Controls.Add(this.rotationMap3Preview);
+            this.rotationMapGroup.Controls.Add(this.rotationMap2Preview);
+            this.rotationMapGroup.Controls.Add(this.rotationMap1Preview);
+            this.rotationMapGroup.Controls.Add(this.rotationMapToolbar);
+            this.rotationMapGroup.Controls.Add(this.rotationMap0Preview);
+            this.rotationMapGroup.Location = new System.Drawing.Point(1211, 343);
+            this.rotationMapGroup.Name = "rotationMapGroup";
+            this.rotationMapGroup.Size = new System.Drawing.Size(296, 334);
+            this.rotationMapGroup.TabIndex = 13;
+            this.rotationMapGroup.TabStop = false;
+            this.rotationMapGroup.Text = "Rotation Map";
+            // 
+            // rotationMap3Preview
+            // 
+            this.rotationMap3Preview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rotationMap3Preview.BackColor = System.Drawing.Color.Black;
+            this.rotationMap3Preview.Location = new System.Drawing.Point(148, 186);
+            this.rotationMap3Preview.Name = "rotationMap3Preview";
+            this.rotationMap3Preview.Size = new System.Drawing.Size(142, 142);
+            this.rotationMap3Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.rotationMap3Preview.TabIndex = 5;
+            this.rotationMap3Preview.TabStop = false;
+            this.rotationMap3Preview.Click += new System.EventHandler(this.rotationMap3Preview_Click);
+            // 
+            // rotationMap2Preview
+            // 
+            this.rotationMap2Preview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rotationMap2Preview.BackColor = System.Drawing.Color.Black;
+            this.rotationMap2Preview.Location = new System.Drawing.Point(6, 186);
+            this.rotationMap2Preview.Name = "rotationMap2Preview";
+            this.rotationMap2Preview.Size = new System.Drawing.Size(142, 142);
+            this.rotationMap2Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.rotationMap2Preview.TabIndex = 4;
+            this.rotationMap2Preview.TabStop = false;
+            this.rotationMap2Preview.Click += new System.EventHandler(this.rotationMap2Preview_Click);
+            // 
+            // rotationMap1Preview
+            // 
+            this.rotationMap1Preview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rotationMap1Preview.BackColor = System.Drawing.Color.Black;
+            this.rotationMap1Preview.Location = new System.Drawing.Point(148, 44);
+            this.rotationMap1Preview.Name = "rotationMap1Preview";
+            this.rotationMap1Preview.Size = new System.Drawing.Size(142, 142);
+            this.rotationMap1Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.rotationMap1Preview.TabIndex = 3;
+            this.rotationMap1Preview.TabStop = false;
+            this.rotationMap1Preview.Click += new System.EventHandler(this.rotationMap1Preview_Click);
+            // 
+            // rotationMapToolbar
+            // 
+            this.rotationMapToolbar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.rotationMapToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.rotationMap0Import,
+            this.rotationMap0Export,
+            this.rotationMapSeparator1,
+            this.rotationMap1Import,
+            this.rotationMap1Export,
+            this.rotationMapSeparator2,
+            this.rotationMap2Import,
+            this.rotationMap2Export,
+            this.rotationMapSeparator3,
+            this.rotationMap3Import,
+            this.rotationMap3Export});
+            this.rotationMapToolbar.Location = new System.Drawing.Point(3, 16);
+            this.rotationMapToolbar.Name = "rotationMapToolbar";
+            this.rotationMapToolbar.Size = new System.Drawing.Size(290, 25);
+            this.rotationMapToolbar.TabIndex = 2;
+            this.rotationMapToolbar.Text = "toolStrip2";
+            // 
+            // rotationMap0Import
+            // 
+            this.rotationMap0Import.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap0Import.Image = global::BZ2TerrainEditor.Properties.Resources.document_import_0;
+            this.rotationMap0Import.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap0Import.Name = "rotationMap0Import";
+            this.rotationMap0Import.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap0Import.Text = "Import Layer 0";
+            this.rotationMap0Import.Click += new System.EventHandler(this.rotationMap0Import_Click);
+            // 
+            // rotationMap0Export
+            // 
+            this.rotationMap0Export.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap0Export.Image = global::BZ2TerrainEditor.Properties.Resources.document_export_0;
+            this.rotationMap0Export.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap0Export.Name = "rotationMap0Export";
+            this.rotationMap0Export.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap0Export.Text = "Export Layer 0";
+            this.rotationMap0Export.Click += new System.EventHandler(this.rotationMap0Export_Click);
+            // 
+            // rotationMapSeparator1
+            // 
+            this.rotationMapSeparator1.Name = "rotationMapSeparator1";
+            this.rotationMapSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // rotationMap1Import
+            // 
+            this.rotationMap1Import.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap1Import.Image = global::BZ2TerrainEditor.Properties.Resources.document_import_1;
+            this.rotationMap1Import.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap1Import.Name = "rotationMap1Import";
+            this.rotationMap1Import.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap1Import.Text = "Import Layer 1";
+            this.rotationMap1Import.Click += new System.EventHandler(this.rotationMap1Import_Click);
+            // 
+            // rotationMap1Export
+            // 
+            this.rotationMap1Export.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap1Export.Image = global::BZ2TerrainEditor.Properties.Resources.document_export_1;
+            this.rotationMap1Export.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap1Export.Name = "rotationMap1Export";
+            this.rotationMap1Export.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap1Export.Text = "Export Layer 1";
+            this.rotationMap1Export.Click += new System.EventHandler(this.rotationMap1Export_Click);
+            // 
+            // rotationMapSeparator2
+            // 
+            this.rotationMapSeparator2.Name = "rotationMapSeparator2";
+            this.rotationMapSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // rotationMap2Import
+            // 
+            this.rotationMap2Import.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap2Import.Image = global::BZ2TerrainEditor.Properties.Resources.document_import_2;
+            this.rotationMap2Import.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap2Import.Name = "rotationMap2Import";
+            this.rotationMap2Import.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap2Import.Text = "Import Layer 2";
+            this.rotationMap2Import.Click += new System.EventHandler(this.rotationMap2Import_Click);
+            // 
+            // rotationMap2Export
+            // 
+            this.rotationMap2Export.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap2Export.Image = global::BZ2TerrainEditor.Properties.Resources.document_export_2;
+            this.rotationMap2Export.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap2Export.Name = "rotationMap2Export";
+            this.rotationMap2Export.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap2Export.Text = "Export Layer 2";
+            this.rotationMap2Export.Click += new System.EventHandler(this.rotationMap2Export_Click);
+            // 
+            // rotationMapSeparator3
+            // 
+            this.rotationMapSeparator3.Name = "rotationMapSeparator3";
+            this.rotationMapSeparator3.Size = new System.Drawing.Size(6, 25);
+            // 
+            // rotationMap3Import
+            // 
+            this.rotationMap3Import.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap3Import.Image = global::BZ2TerrainEditor.Properties.Resources.document_import_3;
+            this.rotationMap3Import.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap3Import.Name = "rotationMap3Import";
+            this.rotationMap3Import.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap3Import.Text = "Import Layer 3";
+            this.rotationMap3Import.Click += new System.EventHandler(this.rotationMap3Import_Click);
+            // 
+            // rotationMap3Export
+            // 
+            this.rotationMap3Export.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.rotationMap3Export.Image = global::BZ2TerrainEditor.Properties.Resources.document_export_3;
+            this.rotationMap3Export.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rotationMap3Export.Name = "rotationMap3Export";
+            this.rotationMap3Export.Size = new System.Drawing.Size(23, 22);
+            this.rotationMap3Export.Text = "Export Layer 3";
+            this.rotationMap3Export.Click += new System.EventHandler(this.rotationMap3Export_Click);
+            // 
+            // rotationMap0Preview
+            // 
+            this.rotationMap0Preview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rotationMap0Preview.BackColor = System.Drawing.Color.Black;
+            this.rotationMap0Preview.Location = new System.Drawing.Point(6, 44);
+            this.rotationMap0Preview.Name = "rotationMap0Preview";
+            this.rotationMap0Preview.Size = new System.Drawing.Size(142, 142);
+            this.rotationMap0Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.rotationMap0Preview.TabIndex = 1;
+            this.rotationMap0Preview.TabStop = false;
+            this.rotationMap0Preview.Click += new System.EventHandler(this.rotationMap0Preview_Click);
+            // 
             // flatnessMapGroup
             // 
             this.flatnessMapGroup.Controls.Add(this.tileFlatZoneIDs);
@@ -1290,7 +1500,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1258, 744);
+            this.ClientSize = new System.Drawing.Size(1550, 744);
             this.Controls.Add(this.flowLayout);
             this.Controls.Add(this.tools);
             this.Controls.Add(this.menu);
@@ -1348,6 +1558,14 @@
             this.tileMapToolbar.ResumeLayout(false);
             this.tileMapToolbar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tileMap0Preview)).EndInit();
+            this.rotationMapGroup.ResumeLayout(false);
+            this.rotationMapGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap3Preview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap2Preview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap1Preview)).EndInit();
+            this.rotationMapToolbar.ResumeLayout(false);
+            this.rotationMapToolbar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rotationMap0Preview)).EndInit();
             this.flatnessMapGroup.ResumeLayout(false);
             this.flatnessMapGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tileFlatZoneIDs)).EndInit();
@@ -1446,7 +1664,24 @@
 		private System.Windows.Forms.ToolStripSeparator tileMapSeparator3;
 		private System.Windows.Forms.ToolStripButton tileMap3Import;
 		private System.Windows.Forms.ToolStripButton tileMap3Export;
-		private System.Windows.Forms.ToolStripButton heightMapTranslate;
+        private System.Windows.Forms.GroupBox rotationMapGroup;
+        private System.Windows.Forms.PictureBox rotationMap3Preview;
+        private System.Windows.Forms.PictureBox rotationMap2Preview;
+        private System.Windows.Forms.PictureBox rotationMap1Preview;
+        private System.Windows.Forms.PictureBox rotationMap0Preview;
+        private System.Windows.Forms.ToolStrip rotationMapToolbar;
+        private System.Windows.Forms.ToolStripButton rotationMap0Import;
+        private System.Windows.Forms.ToolStripButton rotationMap0Export;
+        private System.Windows.Forms.ToolStripSeparator rotationMapSeparator1;
+        private System.Windows.Forms.ToolStripButton rotationMap1Import;
+        private System.Windows.Forms.ToolStripButton rotationMap1Export;
+        private System.Windows.Forms.ToolStripSeparator rotationMapSeparator2;
+        private System.Windows.Forms.ToolStripButton rotationMap2Import;
+        private System.Windows.Forms.ToolStripButton rotationMap2Export;
+        private System.Windows.Forms.ToolStripSeparator rotationMapSeparator3;
+        private System.Windows.Forms.ToolStripButton rotationMap3Import;
+        private System.Windows.Forms.ToolStripButton rotationMap3Export;
+        private System.Windows.Forms.ToolStripButton heightMapTranslate;
 		private System.Windows.Forms.ToolStripButton heightMapOverlayCheck;
 		private System.Windows.Forms.PictureBox heightMapOverlay;
 		private System.Windows.Forms.ToolStripLabel heightMapMinMaxLabel;

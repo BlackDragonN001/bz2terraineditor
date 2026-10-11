@@ -103,6 +103,7 @@
             this.versionSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.versionSelector.FormattingEnabled = true;
             this.versionSelector.Items.AddRange(new object[] {
+            "6",
             "5",
             "4",
             "3",

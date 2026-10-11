@@ -59,6 +59,7 @@ namespace BZ2TerrainEditor
         private string lastAlpha2;
         private string lastAlpha3;
         private string[] lastTileMap = new string[4];
+        private string[] lastRotationMap = new string[4];
 
         #endregion
 
@@ -206,6 +207,10 @@ namespace BZ2TerrainEditor
             this.tileMap1Preview.Image = this.generateTileMapImage(this.terrain.InfoMap, 1);
             this.tileMap2Preview.Image = this.generateTileMapImage(this.terrain.InfoMap, 2);
             this.tileMap3Preview.Image = this.generateTileMapImage(this.terrain.InfoMap, 3);
+            this.rotationMap0Preview.Image = this.generateRotationMapImage(this.terrain.RotationMap, 0);
+            this.rotationMap1Preview.Image = this.generateRotationMapImage(this.terrain.RotationMap, 1);
+            this.rotationMap2Preview.Image = this.generateRotationMapImage(this.terrain.RotationMap, 2);
+            this.rotationMap3Preview.Image = this.generateRotationMapImage(this.terrain.RotationMap, 3);
             RegenerateDerivativeData();
             if (this.terrain.Version < 4)
             {
@@ -927,6 +932,33 @@ namespace BZ2TerrainEditor
                 {
                     int v = (byte)((map[x, y] >> shift) & 0xF);
                     byte color = (byte)(v | (v << 4));
+                    buffer[i++] = color;
+                    buffer[i++] = color;
+                    buffer[i++] = color;
+                }
+            }
+
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            Bitmap bmp = new Bitmap(width, height, width * 3, PixelFormat.Format24bppRgb, handle.AddrOfPinnedObject());
+            this.imageHandles.Add(handle);
+            return bmp;
+        }
+
+        private Bitmap generateRotationMapImage(byte[,] map, int layer)
+        {
+            int width = map.GetUpperBound(0) + 1;
+            int height = map.GetUpperBound(1) + 1;
+            int shift = layer * 2;
+
+            byte[] buffer = new byte[width * height * 3];
+
+            int i = 0;
+            for (int y = height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int rot = (map[x, y] >> shift) & 0x3;
+                    byte color = (byte)(rot * 85);
                     buffer[i++] = color;
                     buffer[i++] = color;
                     buffer[i++] = color;
@@ -2329,6 +2361,133 @@ namespace BZ2TerrainEditor
         }
 
         #endregion
+
+        #endregion
+
+        #region Rotation Map
+
+        private void importRotationMap(int layer)
+        {
+            if (this.terrain == null)
+                return;
+
+            Bitmap bitmap = this.loadBitmap(ref lastRotationMap[layer], this.terrain.RotationMap.GetUpperBound(0) + 1, this.terrain.RotationMap.GetUpperBound(1) + 1);
+            if (bitmap == null)
+                return;
+
+            bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            byte[] buffer = new byte[data.Height * data.Stride];
+            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
+
+            int shift = layer * 2;
+            byte mask = (byte)~(0x3 << shift);
+
+            for (int y = 0; y < data.Height; y++)
+            {
+                for (int x = 0; x < data.Width; x++)
+                {
+                    byte val = buffer[y * data.Stride + x * 3];
+                    byte rot = (byte)Math.Min(3, val / 64);
+                    terrain.RotationMap[x, y] = (byte)((terrain.RotationMap[x, y] & mask) | (rot << shift));
+                }
+            }
+
+            this.changed = true;
+            this.initialize();
+        }
+
+        private void rotationMap0Preview_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            ImageViewer viewer = new ImageViewer(this.rotationMap0Preview.Image, "Rotation Map (Layer 0)");
+            this.forms.Add(viewer);
+            viewer.Show();
+        }
+
+        private void rotationMap0Import_Click(object sender, EventArgs e)
+        {
+            this.importRotationMap(0);
+        }
+
+        private void rotationMap0Export_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            this.saveImage(this.rotationMap0Preview.Image);
+        }
+
+        private void rotationMap1Preview_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            ImageViewer viewer = new ImageViewer(this.rotationMap1Preview.Image, "Rotation Map (Layer 1)");
+            this.forms.Add(viewer);
+            viewer.Show();
+        }
+
+        private void rotationMap1Import_Click(object sender, EventArgs e)
+        {
+            this.importRotationMap(1);
+        }
+
+        private void rotationMap1Export_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            this.saveImage(this.rotationMap1Preview.Image);
+        }
+
+        private void rotationMap2Preview_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            ImageViewer viewer = new ImageViewer(this.rotationMap2Preview.Image, "Rotation Map (Layer 2)");
+            this.forms.Add(viewer);
+            viewer.Show();
+        }
+
+        private void rotationMap2Import_Click(object sender, EventArgs e)
+        {
+            this.importRotationMap(2);
+        }
+
+        private void rotationMap2Export_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            this.saveImage(this.rotationMap2Preview.Image);
+        }
+
+        private void rotationMap3Preview_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            ImageViewer viewer = new ImageViewer(this.rotationMap3Preview.Image, "Rotation Map (Layer 3)");
+            this.forms.Add(viewer);
+            viewer.Show();
+        }
+
+        private void rotationMap3Import_Click(object sender, EventArgs e)
+        {
+            this.importRotationMap(3);
+        }
+
+        private void rotationMap3Export_Click(object sender, EventArgs e)
+        {
+            if (this.terrain == null)
+                return;
+
+            this.saveImage(this.rotationMap3Preview.Image);
+        }
 
         #region Flatness Maps
 

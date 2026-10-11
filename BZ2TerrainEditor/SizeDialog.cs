@@ -56,10 +56,11 @@ namespace BZ2TerrainEditor
 
         private void versionSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            version = (uint)(5 - versionSelector.SelectedIndex);
+            version = (uint)(6 - versionSelector.SelectedIndex);
 
             switch(version)
             {
+                case 6:
                 case 5:
                 case 4:
                     valueSelector.Increment = 16;
@@ -84,10 +85,11 @@ namespace BZ2TerrainEditor
 
         private void UpdateMeterTip()
         {
-            version = (uint)(5 - versionSelector.SelectedIndex);
+            version = (uint)(6 - versionSelector.SelectedIndex);
 
             switch (version)
             {
+                case 6:
                 case 5:
                 case 4:
                     meterTip.Text = $"{(this.valueSelector.Value * 2)} Meters (at default density)";

@@ -82,6 +82,15 @@ namespace BZ2TerrainEditor
 		/// </summary>
 		public readonly uint[,] InfoMap;
 
+        /// <summary>
+		/// Cluster tile rotation (V6+).
+		/// Bits 0-1: Rotation for layer 0.
+		/// Bits 2-3: Rotation for layer 1.
+		/// Bits 4-5: Rotation for layer 2.
+		/// Bits 6-7: Rotation for layer 3.
+		/// </summary>
+		public readonly byte[,] RotationMap;
+
         private short heightMapMin;
         private short heightMapMax;
 
@@ -165,6 +174,7 @@ namespace BZ2TerrainEditor
 			this.AlphaMap3 = new byte[width, height];
 			this.CellMap = new CellType[width, height];
 			this.InfoMap = new uint[width / CLUSTER_SIZE, height / CLUSTER_SIZE];
+            this.RotationMap = new byte[width / CLUSTER_SIZE, height / CLUSTER_SIZE];
             this.TileAverageHeight = new float[width / CLUSTER_SIZE, height / CLUSTER_SIZE];
             this.TileFlatness = new float[width / CLUSTER_SIZE, height / CLUSTER_SIZE];
 
@@ -660,6 +670,11 @@ namespace BZ2TerrainEditor
 					// info map
 					writer.Write(this.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE]);
 
+                    if (Version >= 6)
+                    {
+                        writer.Write(this.RotationMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE]);
+                    }
+
                     // ???
                     if (Version > 0)
                     {
@@ -699,7 +714,8 @@ namespace BZ2TerrainEditor
 				for (int x = 0; x < this.Width / CLUSTER_SIZE; x++)
 				{
 					this.InfoMap[x, y] = 0;
-				}
+                    this.RotationMap[x, y] = 0;
+                }
 			}
 
             RegenerateDerivativeData();
@@ -747,7 +763,7 @@ namespace BZ2TerrainEditor
             UInt32 version = 0;
             if (!version0) version = reader.ReadUInt32();
 
-			if(version < 0 || version > 5)
+			if(version < 0 || version > 6)
 				throw new NotSupportedException(string.Format("Version {0} is not supported.", version));
 
             if (version >= 4) CLUSTER_SIZE = 16;
@@ -1006,6 +1022,12 @@ namespace BZ2TerrainEditor
                     {
                         UInt32 value = reader.ReadUInt32();
                         terrain.InfoMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE] = value;
+                    }
+
+                    // rotation map
+                    if (version >= 6)
+                    {
+                        terrain.RotationMap[x / CLUSTER_SIZE, y / CLUSTER_SIZE] = reader.ReadByte();
                     }
 
                     // ???
