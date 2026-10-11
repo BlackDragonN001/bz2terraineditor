@@ -41,6 +41,7 @@
   <ItemGroup>
     <Reference Include="BitMiracle.LibTiff.NET40, Version=2.4.584.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
       <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.584.1\lib\net40\BitMiracle.LibTiff.NET40.dll</HintPath>
+	  <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -141,6 +142,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SizeDialog.resx">
       <DependentUpon>SizeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<EmbeddedResource Include="..\packages\BitMiracle.LibTiff.NET.2.4.584.1\lib\net40\BitMiracle.LibTiff.NET40.dll">
+      <LogicalName>BitMiracle.LibTiff.NET40.dll</LogicalName>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
